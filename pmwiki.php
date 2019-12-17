@@ -59,7 +59,8 @@ $Newline = "\263";                                 # deprecated, 2.0.0
 $KeepToken = "\034\034";
 $Now=time();
 define('READPAGE_CURRENT', $Now+604800);
-$TimeFmt = '%B %d, %Y, at %I:%M %p';
+$TimeFmt = '%d %B %Y - %I:%M %p';
+#$TimeFmt = '%d %B %Y - %X';
 $TimeISOFmt = '%Y-%m-%dT%H:%M:%S';
 $TimeISOZFmt = '%Y-%m-%dT%H:%M:%SZ';
 $MessagesFmt = array();
@@ -171,11 +172,16 @@ $CacheActions = array('browse','diff','print');
 $EnableHTMLCache = 0;
 $NoHTMLCache = 0;
 $HTMLTagAttr = '';
-$HTMLDoctypeFmt = 
+
+/*$HTMLDoctypeFmt = 
   "<!DOCTYPE html 
     PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
     \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
-  <html xmlns='http://www.w3.org/1999/xhtml' \$HTMLTagAttr><head>\n";
+  <html xmlns='http://www.w3.org/1999/xhtml' \$HTMLTagAttr><head>\n";*/
+
+$HTMLDoctypeFmt = "<!DOCTYPE html> <html \$HTMLTagAttr><head>\n";
+
+
 $HTMLStylesFmt['pmwiki'] = "
   ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
   code.escaped { white-space: pre; }
@@ -314,11 +320,16 @@ elseif (isset($_POST['action'])) $action = $_POST['action'];
 else $action = 'browse';
 
 $pagename = @$_REQUEST['n'];
+
 if (!$pagename) $pagename = @$_REQUEST['pagename'];
+
 if (!$pagename && 
     preg_match('!^'.preg_quote($_SERVER['SCRIPT_NAME'],'!').'/?([^?]*)!',
       $_SERVER['REQUEST_URI'],$match))
   $pagename = urldecode($match[1]);
+
+
+
 if (preg_match('/[\\x80-\\xbf]/',$pagename)) 
   $pagename=utf8_decode($pagename);
 $pagename = preg_replace('![^[:alnum:]\\x80-\\xff]+$!','',$pagename);
@@ -1161,7 +1172,8 @@ class PageStore {
   function delete($pagename) {
     global $Now, $PageExistsCache;
     $pagefile = $this->pagefile($pagename);
-    @rename($pagefile,"$pagefile,del-$Now");
+   // @rename($pagefile,"$pagefile,del-$Now");
+    unlink($pagefile);
     unset($PageExistsCache[$pagename]); # PITS:01401
   }
   function ls($pats=NULL) {
@@ -1332,8 +1344,10 @@ function PrintWikiPage($pagename, $wikilist=NULL, $auth='read') {
     if (PageExists($p)) {
       $page = ($auth) ? RetrieveAuthPage($p, $auth, false, READPAGE_CURRENT)
               : ReadPage($p, READPAGE_CURRENT);
-      if ($page['text']) 
+      if ($page['text']) {
+
         echo MarkupToHTML($pagename,Qualify($p, $page['text']));
+      }
       return;
     }
   }
@@ -1797,7 +1811,13 @@ function HandleBrowse($pagename, $auth = 'read') {
   $page = RetrieveAuthPage($pagename, $auth, true, READPAGE_CURRENT);
   if (!$page) Abort("?cannot read $pagename");
   PCache($pagename,$page);
-  if (PageExists($pagename)) $text = @$page['text'];
+  if (PageExists($pagename)) {
+    $text = @$page['text'];
+    if (AttachExist($pagename)){
+      $text = $text . "\n(:attachlist:)";      
+    }
+    
+  }
   else {
     SDV($DefaultPageTextFmt,'(:include $[{$SiteGroup}.PageNotFound]:)');
     $text = FmtPageName($DefaultPageTextFmt, $pagename);
