@@ -117,7 +117,7 @@ Markup('attachlist', 'directives',
   "MarkupFmtUploadList");
 function MarkupFmtUploadList($m) {
   extract($GLOBALS["MarkupToHTML"]); # get $pagename
-  return Keep('<ul>'.FmtUploadList($pagename,$m[1]).'</ul>');
+  return Keep('<p><strong>File</strong></p><div class="indent"><ul class="file">'.FmtUploadList($pagename,$m[1]).'</ul></div>');
 }
 SDV($GUIButtons['attach'], array(220, 'Attach:', '', '$[file.ext]',
   '$GUIButtonDirUrlFmt/attach.gif"$[Attach file]"'));
@@ -362,9 +362,24 @@ function FmtUploadList($pagename, $args) {
         href='\$LinkUpload'>&nbsp;&Delta;</a>",
         $pagename);
     $lnk = FmtPageName($fmt, $pagename);
-    $out[] = "<li> $lnk$overwrite ... ".
+    /*$out[] = "<li> $lnk$overwrite ... ".
       number_format($stat['size']) . " bytes ... " . 
       strftime($TimeFmt, $stat['mtime']) . "</li>";
+    */
+    //$out[] = "<li>$lnk ". number_format($stat['size']) . " bytes </li> ";
+  
+
+    if ($stat['size'] > (1024*1024)){
+      $relsize = round($stat['size'] / (1024*1024) , 2);
+      $out[] = "<li>$lnk ". $relsize . " MB </li> ";
+    }
+    else {
+      $relsize = round($stat['size'] / 1024 , 2);
+      $out[] = "<li>$lnk ". $relsize . " KB </li> ";
+    }
+
+    
+
   }
   return implode("\n",$out);
 }
