@@ -17,6 +17,15 @@ html{
 	scroll-behavior:smooth;
 }	
 
+ul.file{
+  list-style-image: url('/r/pub/file.png');
+  margin-left: -19px;
+}
+
+.file li::marker {
+  font-size:5px;
+}
+
 a {
 	text-decoration :none;
 	color:blue;
@@ -182,7 +191,7 @@ border-bottom:none!important;
 }
 
 .vspace {
-	margin-top:0px!important;
+	/*margin-top:0px!important;  */
 }
 
 .img_showcase {
@@ -203,3 +212,4 @@ border-bottom:none!important;
   width:100%;
 }
 }
+
