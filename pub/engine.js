@@ -35,11 +35,84 @@ function titleCaser(item) {
 	return combined
 }
 
+function copyToClipboard(str){
+	var el = document.createElement('textarea');
+	el.value = str;
+	el.setAttribute('readonly','');
+	el.style = {display:'none'};
+	document.body.appendChild(el);
+	el.select();
+	document.execCommand('copy');
+	document.body.removeChild(el);
+}
+
+
+var dropArea = document.querySelector("#dropzone");
+var everything = document.querySelector("body");
+dropArea.addEventListener("dragenter",preventDefaults,false);
+dropArea.addEventListener("dragover",preventDefaults,false);
+dropArea.addEventListener("dragleave",preventDefaults,false);
+dropArea.addEventListener("drop",preventDefaults,false);
+
+dropArea.addEventListener("dragenter",highlight,false);
+dropArea.addEventListener("dragover",highlight,false);
+dropArea.addEventListener("dragleave",unhighlight,false);
+dropArea.addEventListener("drop",unhighlight,false);
+
+everything.addEventListener("dragenter",highlight,false);
+everything.addEventListener("dragover",highlight,false);
+everything.addEventListener("dragleave",unhighlight,false);
+everything.addEventListener("drop",unhighlight,false);
+
+dropArea.addEventListener("drop",handleDrop,false);
+
+function preventDefaults(e){
+	e.preventDefault()
+	e.stopPropagation()
+}
+function highlight(e){
+	console.log("dragenter!")
+	dropArea.classList.add('highlight')
+}
+function unhighlight(e){
+	dropArea.classList.remove('highlight')
+}
+function handleDrop(e){
+	var dt = e.dataTransfer
+	var files = dt.files
+	console.log(files)
+	handleFiles(files)
+}
+function handleFiles(files){
+	([...files].forEach(uploadFile))
+}
+function uploadFile(file){
+	console.log(file)
+	var url = window.location.href +"?action=postupload";
+	var fullURL = window.location.href;
+  fullURL = fullURL.split("/")
+  var n = fullURL[fullURL.length-2]+"."+fullURL[fullURL.length-1]
+
+	console.log(url);
+	var formData = new FormData()
+	formData.append('n',n)
+	formData.append('action',"postupload")
+	formData.append('uploadfile',file)
+	fetch(url,{
+		method:'POST',
+		body:formData
+	})
+	.then((e)=>{console.log(e)})
+	.catch(()=>{console.log("error")})
+}
+
+
+
 //Shortcut Functionality
 //Ctrl + . = New node
 //Only work for main namespace :(
 document.onkeyup = function(e) {
-
+  console.log(e.which);
   if (e.ctrlKey && e.which == 190) {
 	var a = prompt("Node name");
 	if (a != null){
@@ -78,8 +151,24 @@ document.onkeyup = function(e) {
 		var URL = baseURL + a + "?action=edit";
 		window.location = baseURL + a;
 	}
-  
   }
+  else if (e.ctrlKey && e.which == 59){
+  	var fullURL = window.location.href;
+  	fullURL = fullURL.split("/")
+  	var nodeKey = fullURL[fullURL.length-1];
+  	var titleNode = document.querySelector(".pagetitle");
+  	var linkSyntax = "[[" + nodeKey +"|" + titleNode.innerHTML  +"]]";
+  	console.log(nodeKey);
+  	console.log(titleNode.innerHTML);
+  	console.log(linkSyntax);
+  	copyToClipboard(linkSyntax);
+  	var oldTitle = document.title;
+  	document.title = "Node Copied..";
+  	setTimeout(function(){
+  		document.title = oldTitle;
+  	}, 1000);
+  }
+
 };
 
 //"Class" Functionality
@@ -96,9 +185,19 @@ targetnode.href = target
 
 
 var textarea = window.document.querySelector("textarea");
-textarea.onkeyup = function(e){
-	if(e.which == 34){
-		window.scrollBy(0,125);	
+if(textarea){	
+	textarea.onkeyup = function(e){
+		if(textarea.scrollTop != 0){
+			textarea.style.height = textarea.scrollHeight + "px";
+			console.log("Did something! " + textarea.scrollTop)
+		}
+	
+		if(e.which == 34){
+			window.scrollBy(0,125);	
+		}
+		else if (e.which == 33){
+			window.scrollBy(0,-125);
+		}
 	}
 }
 
@@ -107,14 +206,10 @@ textarea.onkeyup = function(e){
 
 window.addEventListener("load",function() {
 	textarea = window.document.querySelector("textarea");
+	if(textarea){
 	textarea.style.height = textarea.scrollHeight + "px";
-	textarea.addEventListener("keypress",function(){
-		//If textarea generates a scrollbar. Adjust the height
-		if(textarea.scrollTop != 0){
-			textarea.style.height = textarea.scrollHeight + "px";
-			console.log("Did something! " + textarea.scrollTop)
-		}
-	},false);
+	}
+	
 },false);
 
 
