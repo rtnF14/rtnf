@@ -102,7 +102,15 @@ function uploadFile(file){
 		method:'POST',
 		body:formData
 	})
-	.then((e)=>{console.log(e)})
+	.then((e)=>{
+		console.log(e)
+		var responseURL = e.url
+		if (responseURL.includes("upresult=success")){
+			window.location = window.location.href
+
+		}
+
+	})
 	.catch(()=>{console.log("error")})
 }
 
@@ -112,7 +120,7 @@ function uploadFile(file){
 //Ctrl + . = New node
 //Only work for main namespace :(
 document.onkeyup = function(e) {
-  console.log(e.which);
+  //console.log(e.which);
   if (e.ctrlKey && e.which == 190) {
 	var a = prompt("Node name");
 	if (a != null){
@@ -158,15 +166,52 @@ document.onkeyup = function(e) {
   	var nodeKey = fullURL[fullURL.length-1];
   	var titleNode = document.querySelector(".pagetitle");
   	var linkSyntax = "[[" + nodeKey +"|" + titleNode.innerHTML  +"]]";
-  	console.log(nodeKey);
-  	console.log(titleNode.innerHTML);
-  	console.log(linkSyntax);
   	copyToClipboard(linkSyntax);
   	var oldTitle = document.title;
   	document.title = "Node Copied..";
   	setTimeout(function(){
   		document.title = oldTitle;
   	}, 1000);
+  }
+  else if (e.ctrlKey && e.which == 222){
+  	var n = document.querySelector("form[name='nodeeditor'] input[name='n']").value
+  	var basetime = document.querySelector("form[name='nodeeditor'] input[name='basetime']").value
+		var textContent = document.querySelector("#text").value
+		var postbody2 = new URLSearchParams()
+		postbody2.append("action","edit")
+		postbody2.append("n",n)
+		postbody2.append("basetime",basetime)
+		postbody2.append("text",textContent)
+		postbody2.append("csum","")
+		postbody2.append("author","")
+		postbody2.append("postedit"," Save and edit ")
+
+
+		var url = window.location.href;
+		fetch(url,{
+			method:'POST',
+			headers : new Headers({
+				'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+				'Content-Type':'application/x-www-form-urlencoded'}),
+			body:postbody2
+		})
+		.then((e)=>{
+				alert("Saved!	")
+				e.text().then(function(r){
+					console.log(r)
+					var retrievedHTML = r 
+					var newDateRegex = /name='basetime' value='(.*)'/g;
+					var match = newDateRegex.exec(r)
+					var timeCode = match[1]
+					document.querySelector("form[name='nodeeditor'] input[name='basetime']").value = timeCode
+
+				})
+				
+		})
+		.catch((e)=>{
+			console.log("error")
+			console.log(e)
+			})
   }
 
 };
