@@ -115,6 +115,74 @@ function uploadFile(file){
 }
 
 
+function saveChanges(){
+	var n = document.querySelector("form[name='nodeeditor'] input[name='n']").value
+	var basetime = document.querySelector("form[name='nodeeditor'] input[name='basetime']").value
+	var textContent = document.querySelector("#text").value
+	var postbody2 = new URLSearchParams()
+	postbody2.append("action","edit")
+	postbody2.append("n",n)
+	postbody2.append("basetime",basetime)
+	postbody2.append("text",textContent)
+	postbody2.append("csum","")
+	postbody2.append("author","")
+	postbody2.append("postedit"," Save and edit ")
+	var url = window.location.href;
+	fetch(url,{
+		method:'POST',
+		headers : new Headers({
+			'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+			'Content-Type':'application/x-www-form-urlencoded'}),
+		body:postbody2
+	})
+	.then((e)=>{
+			var oldTitle = document.title;
+			document.title = "Saved...";
+			setTimeout(function(){
+				document.title = oldTitle;
+				var d = new Date()
+				var m = d.getMinutes()
+				oldTitle = m + " " + oldTitle
+				document.title = oldTitle
+
+			}, 1000);
+			e.text().then(function(r){
+				console.log(r)
+				var retrievedHTML = r 
+				var newDateRegex = /name='basetime' value='(.*)'/g;
+				var match = newDateRegex.exec(r)
+				var timeCode = match[1]
+				document.querySelector("form[name='nodeeditor'] input[name='basetime']").value = timeCode
+			})		
+	})
+	.catch((e)=>{
+		console.log("error")
+		console.log(e)
+		})
+}
+
+function syncSaveChanges(){
+	document.title = "Saving..";
+	var n = document.querySelector("form[name='nodeeditor'] input[name='n']").value
+	var basetime = document.querySelector("form[name='nodeeditor'] input[name='basetime']").value
+	var textContent = document.querySelector("#text").value
+	var postbody2 = new URLSearchParams()
+	postbody2.append("action","edit")
+	postbody2.append("n",n)
+	postbody2.append("basetime",basetime)
+	postbody2.append("text",textContent)
+	postbody2.append("csum","")
+	postbody2.append("author","")
+	postbody2.append("postedit"," Save and edit ")
+	var url = window.location.href;
+	var xhr = new XMLHttpRequest();
+	xhr.open('POST',url,false)
+	xhr.setRequestHeader = ("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+	xhr.setRequestHeader = ("Content-Type","application/x-www-form-urlencoded")
+	xhr.send(postbody2)
+	document.title = "Saved!";
+}
+
 
 //Shortcut Functionality
 //Ctrl + . = New node
@@ -174,46 +242,8 @@ document.onkeyup = function(e) {
   	}, 1000);
   }
   else if (e.ctrlKey && e.which == 222){
-  	var n = document.querySelector("form[name='nodeeditor'] input[name='n']").value
-  	var basetime = document.querySelector("form[name='nodeeditor'] input[name='basetime']").value
-		var textContent = document.querySelector("#text").value
-		var postbody2 = new URLSearchParams()
-		postbody2.append("action","edit")
-		postbody2.append("n",n)
-		postbody2.append("basetime",basetime)
-		postbody2.append("text",textContent)
-		postbody2.append("csum","")
-		postbody2.append("author","")
-		postbody2.append("postedit"," Save and edit ")
-
-
-		var url = window.location.href;
-		fetch(url,{
-			method:'POST',
-			headers : new Headers({
-				'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-				'Content-Type':'application/x-www-form-urlencoded'}),
-			body:postbody2
-		})
-		.then((e)=>{
-				alert("Saved!	")
-				e.text().then(function(r){
-					console.log(r)
-					var retrievedHTML = r 
-					var newDateRegex = /name='basetime' value='(.*)'/g;
-					var match = newDateRegex.exec(r)
-					var timeCode = match[1]
-					document.querySelector("form[name='nodeeditor'] input[name='basetime']").value = timeCode
-
-				})
-				
-		})
-		.catch((e)=>{
-			console.log("error")
-			console.log(e)
-			})
+  	saveChanges()
   }
-
 };
 
 //"Class" Functionality
@@ -254,9 +284,15 @@ window.addEventListener("load",function() {
 	if(textarea){
 	textarea.style.height = textarea.scrollHeight + "px";
 	}
-	
 },false);
 
+
+window.onbeforeunload = function(){
+	syncSaveChanges();
+	return null;
+}
+
+var intervalID = setInterval(saveChanges,300000)
 
 //Img Server Functionality
 var target1 = document.getElementById("imgstrg").innerHTML
@@ -331,7 +367,7 @@ $(function(){
           alert('But we got its url anyway:' + data.url)
         }
       }).on('pasteText', function(ev, data){
-        $('<div class="result"></div>').text('text: "' + data.text + '"').insertAfter(this);
+        //$('<div class="result"></div>').text('text: "' + data.text + '"').insertAfter(this);
       });
     });
 console.log("Prep done!")
