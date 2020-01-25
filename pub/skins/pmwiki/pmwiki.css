@@ -12,6 +12,15 @@
 
 /* Hide entity image while resolution is not enough to display it*/
 
+@font-face {
+    font-family: 'Noto';
+    font-style: normal;
+    font-weight: normal;
+    src: local('Open Sans Regular'),url('/r/pub/noto.woff2') format('woff');
+}
+
+
+
 
 html{
 	scroll-behavior:smooth;
@@ -67,10 +76,11 @@ pre { line-height:1.2em; }
 pre code, code code, pre pre { font-size:100%; }
 
 textarea {
-font-family: sans-serif;
-    color: #222222;
-    font-size: 15px;
-    line-height: 1.5;
+font-family: 'Noto';
+    color: #1A1A1B;
+    font-size: 14px;
+    line-height: 21px;
+	font-weight:400;
     padding-left: 12px;
     padding-top: 8px;
 }
