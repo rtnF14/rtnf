@@ -1,7 +1,7 @@
 # rtnf
 
 ## Aim
-Store information about entities and the interrelationship between them. 
+Store information about entities.
 
 ## How To Install
 ### Linux
@@ -17,5 +17,4 @@ Store information about entities and the interrelationship between them.
 * Open the browser, access localhost/r
 
 ## How To Use
-To add information about entities, press Ctrl+. , input the node name, press enter. The "edit node" page will be shown, now you can store information about that entities. You can also attach file related to that entities, by dragging the file into the webpage, wait until the page goes black, and drop the file. To save, press Ctrl+' ,or just close the tab, it will automatically save when you close it. 
-
+To add information about entities, press Ctrl+. , input the node name, press enter. The "edit node" page will be shown, now you can store information about that entities. You can also attach any file related to that entities, by dragging the file into the webpage, wait until the page goes black, and drop the file. To save, press Ctrl+' ,or just close the tab, it will automatically save when you close it. 
