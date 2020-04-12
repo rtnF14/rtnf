@@ -232,7 +232,7 @@ function cursorScroll(x){
 	}
 	//Code 2 means go up 5 lines
 	else if (x == 2) {
-		for (var i=cursorPos ; i >= 0 ;i--) {
+		for (var i=cursorPos ; i > 0 ;i--) {
 			if(textVal.charAt(i) == '\n'){
 				counter = counter + 1;
 			}
