@@ -1,0 +1,15 @@
+version=pmwiki-2.2.110 ordered=1 urlencoded=1
+agent=Mozilla/5.0 (X11; Linux x86_64; rv:77.0) Gecko/20100101 Firefox/77.0
+author=
+charset=UTF-8
+csum=
+ctime=1592980422
+host=127.0.0.1
+name=Main.Node
+rev=1
+targets=
+text=Node is the basic unit of rtnF.
+time=1592980422
+author:1592980422=
+diff:1592980422:1592980422:=1d0%0a%3c Node is the basic unit of rtnF.%0a\ No newline at end of file%0a
+host:1592980422=127.0.0.1
