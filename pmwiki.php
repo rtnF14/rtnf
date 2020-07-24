@@ -179,13 +179,13 @@ $HTMLTagAttr = '';
     \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
   <html xmlns='http://www.w3.org/1999/xhtml' \$HTMLTagAttr><head>\n";*/
 
-$HTMLDoctypeFmt = "<!DOCTYPE html> <html \$HTMLTagAttr><head>\n";
+$HTMLDoctypeFmt = "<!DOCTYPE html> <html><head>\n";
 
 
 $HTMLStylesFmt['pmwiki'] = "
   ul, ol, pre, dl, p { margin-top:0px; margin-bottom:0px; }
   code.escaped { white-space: pre; }
-  .vspace { margin-top:1.33em; }
+  .vspace { /*margin-top:1.33em;*/ }
   .indent { margin-left:40px; }
   .outdent { margin-left:40px; text-indent:-40px; }
   a.createlinktext { text-decoration:none; border-bottom:1px dotted gray; }
@@ -319,22 +319,29 @@ if (isset($_GET['action'])) $action = $_GET['action'];
 elseif (isset($_POST['action'])) $action = $_POST['action'];
 else $action = 'browse';
 
+
+
+
 $pagename = @$_REQUEST['n'];
 
 if (!$pagename) $pagename = @$_REQUEST['pagename'];
 
 if (!$pagename && 
     preg_match('!^'.preg_quote($_SERVER['SCRIPT_NAME'],'!').'/?([^?]*)!',
-      $_SERVER['REQUEST_URI'],$match))
+      $_SERVER['REQUEST_URI'],$match)) 
   $pagename = urldecode($match[1]);
-
-
+    
 
 if (preg_match('/[\\x80-\\xbf]/',$pagename)) 
   $pagename=utf8_decode($pagename);
+
+
+
 $pagename = preg_replace('![^[:alnum:]\\x80-\\xff]+$!','',$pagename);
 $pagename_unfiltered = $pagename;
 $pagename = preg_replace('![${}\'"\\\\]+!', '', $pagename);
+
+
 $FmtPV['$RequestedPage'] = 'PHSC($GLOBALS["pagename_unfiltered"], ENT_QUOTES)';
 $Cursor['*'] = &$pagename;
 if (function_exists("date_default_timezone_get") ) { # fix PHP5.3 warnings
@@ -1795,7 +1802,8 @@ function MarkupToHTML($pagename, $text, $opt = NULL) {
         { echo "ERROR: pat=$p $php_errormsg"; unset($php_errormsg); }
       if ($RedoMarkupLine) { $lines=array_merge((array)$x,$lines); continue 2; }
     }
-    if ($x>'') $out .= "$x\n";
+    if ($x>'') $out .= "$x<br>\n";
+
   }
   foreach((array)(@$MarkupFrame[0]['posteval']) as $v) eval($v);
   array_shift($MarkupFrame);
@@ -1816,7 +1824,6 @@ function HandleBrowse($pagename, $auth = 'read') {
     if (AttachExist($pagename)){
       $text = $text . "\n(:attachlist:)";      
     }
-    
   }
   else {
     SDV($DefaultPageTextFmt,'(:include $[{$SiteGroup}.PageNotFound]:)');
@@ -1869,6 +1876,8 @@ function HandleBrowse($pagename, $auth = 'read') {
 ## an optional list of functions to use instead of $EditFunctions.
 function UpdatePage(&$pagename, &$page, &$new, $fnlist = NULL) {
   global $EditFunctions, $IsPagePosted;
+  
+
   StopWatch("UpdatePage: begin $pagename");
   if (is_null($fnlist)) $fnlist = $EditFunctions;
   $IsPagePosted = false;
@@ -2058,6 +2067,7 @@ function HandleEdit($pagename, $auth = 'edit') {
   global $IsPagePosted, $EditFields, $ChangeSummary, $EditFunctions, 
     $EnablePost, $FmtV, $Now, $EditRedirectFmt, 
     $PageEditForm, $HandleEditFmt, $PageStartFmt, $PageEditFmt, $PageEndFmt;
+
   SDV($EditRedirectFmt, '$FullName');
   if (@$_POST['cancel']) 
     { Redirect(FmtPageName($EditRedirectFmt, $pagename)); return; }
@@ -2071,6 +2081,9 @@ function HandleEdit($pagename, $auth = 'edit') {
   if ($ChangeSummary) $new["csum:$Now"] = $ChangeSummary;
   $EnablePost &= preg_grep('/^post/', array_keys(@$_POST));
   $new['=preview'] = $new['text'];
+  
+
+
   PCache($pagename, $new);
   UpdatePage($pagename, $page, $new);
   Lock(0);
@@ -2088,8 +2101,8 @@ function HandleEdit($pagename, $auth = 'edit') {
       Abort("?unable to retrieve edit form $efpage", 'editform');
     $FmtV['$EditForm'] = MarkupToHTML($pagename, $form['text']);
   }
+//<h2 class='wikiaction'>$[Editing {\$FullName}]</h2>
   SDV($PageEditFmt, "<div id='wikiedit'>
-    <h2 class='wikiaction'>$[Editing {\$FullName}]</h2>
     <form method='post' rel='nofollow' action='\$PageUrl?action=edit'>
     <input type='hidden' name='action' value='edit' />
     <input type='hidden' name='n' value='\$FullName' />
@@ -2390,4 +2403,3 @@ function HandleLoginA($pagename, $auth = 'login') {
   $page = RetrieveAuthPage($pagename, $auth, $prompt, READPAGE_CURRENT);
   Redirect($pagename);
 }
-
