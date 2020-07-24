@@ -16,7 +16,7 @@
     font-family: 'Noto';
     font-style: normal;
     font-weight: normal;
-    src: local('Open Sans Regular'),url('/r/pub/noto.woff2') format('woff');
+    src: local('Open Sans Regular'),url('/r3/pub/noto.woff2') format('woff');
 }
 
 
@@ -123,6 +123,10 @@ h6 { font-size:1.0em; }
     font-family: helvetica;
     font-size: 15px;
 } 
+
+#wikiedit{
+  margin-top:-60px;
+}
 
 /* These are for the left-sidebar. */
 #wikileft { 
