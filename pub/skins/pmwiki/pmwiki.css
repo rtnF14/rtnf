@@ -175,7 +175,7 @@ h6 { font-size:1.0em; }
 #wikicmds li a { text-decoration:none; color:black; border:none; }
 #wikicmds li a.createlink { display:none; }
 #wikicmds li a:hover { text-decoration:underline; color:blue; }
-.pagegroup { margin-top:8px; margin-bottom:2px; color:white; }
+.pagegroup { margin-top:8px; margin-bottom:-32px; color:white; }
 .pagetitle {     line-height: 32px;
     margin: 0px;
     font-size: 25px;
