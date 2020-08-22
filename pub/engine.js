@@ -100,6 +100,7 @@ function uploadFile(file){
 		body:formData
 	})
 	.then((e)=>{
+		console.log("Sudah dapat jawaban!")
 		console.log(e)
 		var responseURL = e.url
 		if (responseURL.includes("upresult=success")){
@@ -155,7 +156,7 @@ function saveChanges(){
 
 			}, 1000);
 			e.text().then(function(r){
-				//console.log(r)
+				console.log(r)
 				var retrievedHTML = r 
 				var newDateRegex = /name='basetime' value='(.*)'/g;
 				var match = newDateRegex.exec(r)
@@ -242,7 +243,7 @@ function cursorScroll(x){
 		}
 		if(i != 0) {
 			i = i -1;
-		}
+		} 
 	}
 
 
@@ -336,6 +337,12 @@ document.onkeyup = function(e) {
 	window.location = window.location.href+"?action=edit";
   }
 
+  //Ctrl+[ : Show history
+  else if (e.ctrlKey && e.which == 219) {
+	window.location = window.location.href+"?action=edit";
+  }
+
+
   //Ctrl+; : Copy Current Node
   else if (e.ctrlKey && e.which == 59){
   	var fullURL = window.location.href;
@@ -367,8 +374,19 @@ target = targetnode.href
 target = target.replace("%3C/p%3E","")
 target = target.replace("%3Cp%3E","")
 target = target.replace(new RegExp("%20","g"),"");
+target = target.slice(0,-16)
 console.log(target);
 targetnode.href = target
+
+if(targetnode.innerHTML){
+	console.log(targetnode.innerHTML)
+	targetnode.innerHTML = targetnode.innerHTML.slice(0,-5)	
+	console.log(targetnode.innerHTML)
+}
+
+
+
+
 
 
 //Autogrowing Node Editor Textarea
@@ -401,6 +419,10 @@ window.addEventListener("load",function() {
 	if(textarea){
 	textarea.style.height = textarea.scrollHeight + "px";
 	}
+
+
+
+
 },false);
 
 
@@ -462,7 +484,7 @@ $(function(){
 				$("#text").val(new_tbox_val);
 			}
 		}
-		xhttp.open("POST","http://localhost/r/pub/imgstrg/imgstrg.php")
+		xhttp.open("POST","http://localhost/r3/pub/imgstrg/imgstrg.php")
 		var formData = new FormData();
 		formData.append('size',data.blob.size);
 		formData.append('type',data.blob.type);
