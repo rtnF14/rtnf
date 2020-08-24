@@ -253,18 +253,30 @@ function cursorScroll(x){
 }
 
 
+var currentURL = window.location.href;
+
+
 document.onkeydown = function(e){
 
-	if (e.which == 34) {
-  	e.preventDefault();
-  	cursorScroll(1);
-  }
-  else if (e.which == 33) {
-  	e.preventDefault();
-  	cursorScroll(2);
-  }
+	
+	if ((e.which == 34) && (currentURL.includes("?action=edit"))) {
+  		e.preventDefault();
+  		cursorScroll(1);
+  	}
+  	else if ((e.which == 33) && (currentURL.includes("?action=edit"))) {
+  		e.preventDefault();
+  		cursorScroll(2);
+  	}
 
-}
+} 
+
+
+
+
+
+
+
+
 
 
 //Shortcut Functionality
@@ -282,7 +294,7 @@ document.onkeyup = function(e) {
   		baseURL += "Main/"
   	}
 
-		var a = prompt("Node name");
+		var a = prompt("Enter new note key to create");
 		if (a != null){
 			var split_a = a.split(" ");
 			console.log(split_a);
@@ -312,7 +324,7 @@ document.onkeyup = function(e) {
   		baseURL += "Main/"
   	}
 
-		var a = prompt("Node name");
+		var a = prompt("Enter note key to visit");
 		if (a != null){
 			var split_a = a.split(" ");
 			console.log(split_a);
@@ -337,9 +349,14 @@ document.onkeyup = function(e) {
 	window.location = window.location.href+"?action=edit";
   }
 
-  //Ctrl+[ : Show history
+  //Ctrl+[ : Show current page history
   else if (e.ctrlKey && e.which == 219) {
-	window.location = window.location.href+"?action=edit";
+	window.location = window.location.href+"?action=diff";
+  }
+
+  //Ctrl+] : Show all page history
+  else if (e.ctrlKey && e.which == 221) {
+	window.location = "http://localhost/r3/pub/nodemanager/";
   }
 
 
